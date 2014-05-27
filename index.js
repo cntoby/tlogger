@@ -16,8 +16,10 @@ function tLogger(logfile, multifile) {
     this.dirname = path.dirname(this.logFile);
     this.multiFile = multifile;
     if (!fs.existsSync(this.dirname)) {
-        if (!fs.mkdirSync(this.dirname)) {
-            console.log('Can not create directory ' + this.dirname + '.');
+        try {
+            fs.mkdirSync(this.dirname);
+        }catch (e) {
+            console.log('Can not create directory' + this.dirname + '. ' + e);
             process.exit(1);
         }
     }
