@@ -9,32 +9,28 @@ var fs = require('fs');
 var path = require('path');
 var moment = require('moment');
 
-var dirname = "";
-var logFile = "";
-var basename = "";
-var extname = "";
-var multiFile = false;
-
 function tLogger(logfile, multifile) {
-    logFile = logfile;
-    dirname = path.dirname(logFile);
-    multiFile = multifile;
-    if (!fs.existsSync(dirname)) {
-        if (!fs.mkdirSync(dirname)) {
-            console.log('Can not create directory ' + dirname + '.');
+    this.basename = "";
+    this.extname = "";
+    this.logFile = logfile;
+    this.dirname = path.dirname(this.logFile);
+    this.multiFile = multifile;
+    if (!fs.existsSync(this.dirname)) {
+        if (!fs.mkdirSync(this.dirname)) {
+            console.log('Can not create directory ' + this.dirname + '.');
             process.exit(1);
         }
     }
-    if (multiFile) {
-        extname = path.extname(logFile);
-        basename = path.basename(logFile, extname);
+    if (this.multiFile) {
+        this.extname = path.extname(this.logFile);
+        this.basename = path.basename(this.logFile, this.extname);
     }else {
-        basename = path.basename(logFile);
+        this.basename = path.basename(this.logFile);
     }
 
     this.write = function (type, str) {
         str = moment().format() + "\t[" + type +"]\t" + str + "\n";
-        fs.appendFile(getFile(), str, function (err) {
+        fs.appendFile(this.getFile(), str, function (err) {
             if (err) {
                 console.log(err);
             }
@@ -56,15 +52,16 @@ function tLogger(logfile, multifile) {
     this.notice = function (str) {
         this.write('NOTICE', str);
     }
-}
 
-function getFile() {
-    if (multiFile) {
-        return dirname + '/' + basename + '-' + moment().format('YYYY-MM-DD-HH') + extname;
-    }else {
-        return dirname + '/' + basename;
+    this.getFile = function() {
+        if (this.multiFile) {
+            return this.dirname + '/' + this.basename + '-' + moment().format('YYYY-MM-DD-HH') + this.extname;
+        }else {
+            return this.dirname + '/' + this.basename;
+        }
     }
 }
+
 
 
 module.exports = tLogger;
